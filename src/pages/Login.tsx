@@ -143,9 +143,9 @@ export function Login() {
   };
 
   return (
-    <div className="login-bg">
+    <div className="auth-page">
       <div className="min-h-screen flex items-center justify-center p-4">
-        <div className="login-container max-w-md w-full space-y-8 p-8 rounded-xl">
+        <div className="max-w-md w-full space-y-8 p-8 rounded-xl bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm shadow-lg">
           <div className="text-center">
             <h2 className="mt-6 text-3xl font-bold text-white">
               {isForgotPassword ? "Reset Password" : isSignup ? "Create Account" : "Welcome Back"}

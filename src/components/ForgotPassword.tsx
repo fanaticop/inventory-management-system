@@ -29,54 +29,58 @@ export const ForgotPassword = () => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <div className="max-w-md w-full p-6 bg-white rounded-lg shadow-lg">
-        <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">
-          Reset Password
-        </h2>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-              Email Address
-            </label>
-            <input
-              type="email"
-              id="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
-              required
-            />
-          </div>
-
-          {message && (
-            <div className={`p-3 rounded ${
-              message.type === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
-            }`}>
-              {message.text}
+    <div className="auth-page">
+      <div className="min-h-screen flex items-center justify-center p-4">
+        <div className="max-w-md w-full p-6 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-lg shadow-lg">
+          <h2 className="text-2xl font-bold text-center mb-6 dark:text-white">
+            Reset Password
+          </h2>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                Email Address
+              </label>
+              <input
+                type="email"
+                id="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-gray-900 dark:text-white focus:outline-none focus:ring-purple-500 focus:border-purple-500"
+                required
+              />
             </div>
-          )}
 
-          <button
-            type="submit"
-            disabled={loading}
-            className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary ${
-              loading ? 'opacity-50 cursor-not-allowed' : ''
-            }`}
-          >
-            {loading ? 'Sending...' : 'Send Reset Instructions'}
-          </button>
+            {message && (
+              <div className={`p-3 rounded ${
+                message.type === 'success' 
+                  ? 'bg-green-100 dark:bg-green-800 text-green-700 dark:text-green-100' 
+                  : 'bg-red-100 dark:bg-red-800 text-red-700 dark:text-red-100'
+              }`}>
+                {message.text}
+              </div>
+            )}
 
-          <div className="text-center mt-4">
             <button
-              type="button"
-              onClick={() => navigate('/login')}
-              className="text-sm text-primary hover:text-primary-dark"
+              type="submit"
+              disabled={loading}
+              className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 ${
+                loading ? 'opacity-50 cursor-not-allowed' : ''
+              }`}
             >
-              Back to Login
+              {loading ? 'Sending...' : 'Send Reset Instructions'}
             </button>
-          </div>
-        </form>
+
+            <div className="text-center mt-4">
+              <button
+                type="button"
+                onClick={() => navigate('/login')}
+                className="text-sm text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300"
+              >
+                Back to Login
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   )

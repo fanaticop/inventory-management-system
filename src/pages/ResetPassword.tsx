@@ -117,114 +117,114 @@ export function ResetPassword() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-900">
-      <div className="max-w-md w-full px-6 py-8 bg-gray-800 rounded-lg shadow-md">
-        {token && resetEmail ? (
-          // Reset Password Form
-          <>
-            <h2 className="text-3xl font-bold text-center text-white mb-6">
-              Reset Password
-            </h2>
-            <p className="text-gray-300 text-center mb-6">
-              Enter your new password below
-            </p>
+    <div className="auth-page">
+      <div className="min-h-screen flex items-center justify-center p-4">
+        <div className="max-w-md w-full p-6 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-lg shadow-lg">
+          {token && resetEmail ? (
+            <>
+              <h2 className="text-2xl font-bold text-center mb-6 text-gray-900 dark:text-white">
+                Reset Password
+              </h2>
+              <p className="text-gray-600 dark:text-gray-300 text-center mb-6">
+                Enter your new password below
+              </p>
 
-            {error && (
-              <div className="mb-4 p-4 rounded bg-red-600 text-white">
-                {error}
-              </div>
-            )}
-
-            <form onSubmit={handleResetSubmit} className="space-y-6">
-              <div>
-                <input
-                  type="password"
-                  name="password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  placeholder="New Password"
-                  className="w-full px-4 py-3 rounded bg-gray-700 text-white border border-gray-600 focus:outline-none focus:border-purple-500"
-                  required
-                />
-              </div>
-
-              <div>
-                <input
-                  type="password"
-                  name="confirmPassword"
-                  value={formData.confirmPassword}
-                  onChange={handleChange}
-                  placeholder="Confirm New Password"
-                  className="w-full px-4 py-3 rounded bg-gray-700 text-white border border-gray-600 focus:outline-none focus:border-purple-500"
-                  required
-                />
-              </div>
-
-              <button
-                type="submit"
-                disabled={loading || !isValid}
-                className={`w-full py-3 rounded bg-purple-600 text-white font-semibold hover:bg-purple-700 focus:outline-none transition duration-150 ${
-                  (loading || !isValid) ? 'opacity-50 cursor-not-allowed' : ''
-                }`}
-              >
-                {loading ? 'Resetting...' : 'Reset Password'}
-              </button>
-            </form>
-          </>
-        ) : (
-          // Request Password Reset Form
-          <>
-            <h2 className="text-3xl font-bold text-center text-white mb-6">
-              Reset Password
-            </h2>
-            <p className="text-gray-300 text-center mb-6">
-              Enter your email to receive a password reset link
-            </p>
-
-            <form onSubmit={handleRequestReset} className="space-y-6">
-              <div>
-                <input
-                  type="email"
-                  value={requestEmail}
-                  onChange={(e) => setRequestEmail(e.target.value)}
-                  placeholder="Enter your email"
-                  className="w-full px-4 py-3 rounded bg-gray-700 text-white border border-gray-600 focus:outline-none focus:border-purple-500"
-                  required
-                />
-              </div>
-
-              {message && (
-                <div className={`p-4 rounded text-center ${
-                  message.type === 'success' 
-                    ? 'bg-green-600 text-white' 
-                    : 'bg-red-600 text-white'
-                }`}>
-                  {message.text}
+              {error && (
+                <div className="mb-4 p-4 rounded bg-red-100 dark:bg-red-800 text-red-700 dark:text-red-100">
+                  {error}
                 </div>
               )}
 
-              <button
-                type="submit"
-                disabled={loading}
-                className={`w-full py-3 rounded bg-purple-600 text-white font-semibold hover:bg-purple-700 focus:outline-none transition duration-150 ${
-                  loading ? 'opacity-50 cursor-not-allowed' : ''
-                }`}
-              >
-                {loading ? 'Sending Reset Link...' : 'Send Reset Link'}
-              </button>
+              <form onSubmit={handleResetSubmit} className="space-y-6">
+                <div>
+                  <input
+                    type="password"
+                    name="password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    placeholder="New Password"
+                    className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-gray-900 dark:text-white focus:outline-none focus:ring-purple-500 focus:border-purple-500"
+                    required
+                  />
+                </div>
 
-              <div className="text-center">
+                <div>
+                  <input
+                    type="password"
+                    name="confirmPassword"
+                    value={formData.confirmPassword}
+                    onChange={handleChange}
+                    placeholder="Confirm New Password"
+                    className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-gray-900 dark:text-white focus:outline-none focus:ring-purple-500 focus:border-purple-500"
+                    required
+                  />
+                </div>
+
                 <button
-                  type="button"
-                  onClick={() => navigate('/login')}
-                  className="text-purple-400 hover:text-purple-300 font-medium"
+                  type="submit"
+                  disabled={loading || !isValid}
+                  className={`w-full py-3 rounded bg-purple-600 text-white font-semibold hover:bg-purple-700 focus:outline-none transition duration-150 ${
+                    (loading || !isValid) ? 'opacity-50 cursor-not-allowed' : ''
+                  }`}
                 >
-                  Back to Sign In
+                  {loading ? 'Resetting...' : 'Reset Password'}
                 </button>
-              </div>
-            </form>
-          </>
-        )}
+              </form>
+            </>
+          ) : (
+            <>
+              <h2 className="text-2xl font-bold text-center mb-6 text-gray-900 dark:text-white">
+                Reset Password
+              </h2>
+              <p className="text-gray-600 dark:text-gray-300 text-center mb-6">
+                Enter your email to receive a password reset link
+              </p>
+
+              <form onSubmit={handleRequestReset} className="space-y-6">
+                <div>
+                  <input
+                    type="email"
+                    value={requestEmail}
+                    onChange={(e) => setRequestEmail(e.target.value)}
+                    placeholder="Enter your email"
+                    className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-gray-900 dark:text-white focus:outline-none focus:ring-purple-500 focus:border-purple-500"
+                    required
+                  />
+                </div>
+
+                {message && (
+                  <div className={`p-4 rounded text-center ${
+                    message.type === 'success' 
+                      ? 'bg-green-100 dark:bg-green-800 text-green-700 dark:text-green-100' 
+                      : 'bg-red-100 dark:bg-red-800 text-red-700 dark:text-red-100'
+                  }`}>
+                    {message.text}
+                  </div>
+                )}
+
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className={`w-full py-3 rounded bg-purple-600 text-white font-semibold hover:bg-purple-700 focus:outline-none transition duration-150 ${
+                    loading ? 'opacity-50 cursor-not-allowed' : ''
+                  }`}
+                >
+                  {loading ? 'Sending Reset Link...' : 'Send Reset Link'}
+                </button>
+
+                <div className="text-center">
+                  <button
+                    type="button"
+                    onClick={() => navigate('/login')}
+                    className="text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 font-medium"
+                  >
+                    Back to Sign In
+                  </button>
+                </div>
+              </form>
+            </>
+          )}
+        </div>
       </div>
     </div>
   );
