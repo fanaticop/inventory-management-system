@@ -1,9 +1,12 @@
-// This is a placeholder for Supabase client
-// In a real app, you would initialize the Supabase client with your project URL and anon key
-// For demo purposes, we'll export a mock client
+import { createClient } from '@supabase/supabase-js'
 
-export const supabase = {
-  // Mock methods for demonstration
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
+
+export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+
+// Add auth methods to the client
+export const auth = {
   from: (table: string) => ({
     select: () => ({
       data: [],

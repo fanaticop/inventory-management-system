@@ -1,37 +1,70 @@
-name: Deploy to GitHub Pages
+name: Deploy to GitHub Pagesname: Deploy to GitHub Pages
 
-on:
-  push:
-    branches: [ "master" ]
-  workflow_dispatch:
 
-permissions:
-  contents: write
+
+on:on:
+
+  push:  push:
+
+    branches:    branches: [ "master" ]
+
+      - master  workflow_dispatch:
+
+
+
+permissions:permissions:
+
+  contents: write  contents: write
+
   pages: write
-  id-token: write
 
-jobs:
+jobs:  id-token: write
+
   build-and-deploy:
-    runs-on: ubuntu-latest
-    steps:
+
+    runs-on: ubuntu-latestjobs:
+
+    steps:  build-and-deploy:
+
+      - name: Checkout 🛎️    runs-on: ubuntu-latest
+
+        uses: actions/checkout@v3    steps:
+
       - name: Checkout 🛎️
-        uses: actions/checkout@v3
 
-      - name: Setup Node.js 📦
+      - name: Setup Node.js 📦        uses: actions/checkout@v3
+
         uses: actions/setup-node@v3
+
+        with:      - name: Setup Node.js 📦
+
+          node-version: '18'        uses: actions/setup-node@v3
+
         with:
-          node-version: '18'
-          cache: 'npm'
 
-      - name: Install dependencies 🔧
-        run: npm install
+      - name: Install Dependencies 🔧          node-version: '18'
 
-      - name: Build 🏗️
-        run: npm run build
+        run: npm install          cache: 'npm'
 
-      - name: Deploy to GitHub Pages 🚀
-        uses: JamesIves/github-pages-deploy-action@v4
+
+
+      - name: Build 🏗️      - name: Install dependencies 🔧
+
+        run: npm run build        run: npm install
+
+
+
+      - name: Deploy to GitHub Pages 🚀      - name: Build 🏗️
+
+        uses: peaceiris/actions-gh-pages@v3        run: npm run build
+
         with:
+
+          github_token: ${{ secrets.GITHUB_TOKEN }}      - name: Deploy to GitHub Pages 🚀
+
+          publish_dir: ./dist        uses: JamesIves/github-pages-deploy-action@v4
+
+          force_orphan: true        with:
           folder: dist
           branch: gh-pages
           clean: true
