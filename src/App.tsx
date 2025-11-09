@@ -10,6 +10,7 @@ import { StockDetails } from './pages/StockDetails'
 import { useStore } from './store/useStore'
 import { Login } from './pages/Login'
 import { ResetPassword } from './pages/ResetPassword'
+import { ForgotPassword } from './components/ForgotPassword'
 
 function App() {
   const { isAuthenticated } = useStore()
@@ -21,6 +22,7 @@ function App() {
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
       </Router>

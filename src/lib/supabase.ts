@@ -1,11 +1,10 @@
 import { createClient } from '@supabase/supabase-js'
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
+const supabaseUrl = 'https://kkrshiqqzrgbngczytrg.supabase.co'
+const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtrcnNoaXFxenJnYm5nY3p5dHJnIiwicm9sZSI6ImFub24iLCJpYXQiOjE2OTk1MjgyODgsImV4cCI6MjAxNTEwNDI4OH0.cg_n0K8gz0agi0p0DbUXn-4XE5E8rsEQENrGodYE6tY'
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
-// Add auth methods to the client
 export const auth = {
   from: (table: string) => ({
     select: () => ({
