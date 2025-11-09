@@ -11,9 +11,7 @@ interface SocialLoginModalState {
 
 export function Login() {
   const navigate = useNavigate();
-  const { login, signup, socialLogin, resetPassword } = useStore();
-  const [isSignup, setIsSignup] = useState(false);
-  const [isForgotPassword, setIsForgotPassword] = useState(false);
+  const { login } = useStore();
   const [formData, setFormData] = useState({
     email: '',
     password: '',

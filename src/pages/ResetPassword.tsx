@@ -1,20 +1,38 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { useStore } from '../store/useStore';
-import { validateResetToken } from '../utils/resetToken';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { supabase } from '../lib/supabase';
 
 export function ResetPassword() {
   const navigate = useNavigate();
-  const location = useLocation();
-  const { completePasswordReset } = useStore();
-  
-  const [formData, setFormData] = useState({
-    password: '',
-    confirmPassword: '',
-  });
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [isValid, setIsValid] = useState(false);
+  const [email, setEmail] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setMessage(null);
+
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email);
+      if (error) throw error;
+
+      setMessage({
+        text: 'Password reset instructions have been sent to your email.',
+        type: 'success'
+      });
+
+      // Redirect to login after success message
+      setTimeout(() => navigate('/login'), 3000);
+    } catch (error: any) {
+      setMessage({
+        text: error.message || 'Failed to send reset email',
+        type: 'error'
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Get token and email from URL params
   const searchParams = new URLSearchParams(location.search);
