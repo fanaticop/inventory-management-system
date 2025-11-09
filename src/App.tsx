@@ -19,12 +19,14 @@ function App() {
   if (!isAuthenticated) {
     return (
       <Router>
-        <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route path="/reset-password" element={<ResetPassword />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="*" element={<Navigate to="/login" replace />} />
-        </Routes>
+        <div className="min-h-screen bg-gray-100 dark:bg-gray-900">
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="*" element={<Navigate to="/login" replace />} />
+          </Routes>
+        </div>
       </Router>
     )
   }
@@ -32,12 +34,12 @@ function App() {
   const toggleSidebar = () => setSidebarOpen((s) => !s)
 
   return (
-    <Router>
-      <div className="flex h-screen bg-background">
+      <Router>
+      <div className="flex h-screen bg-gray-100 dark:bg-gray-900">
         <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
         <div className="flex-1 flex flex-col overflow-hidden">
           <Header onToggleSidebar={toggleSidebar} sidebarOpen={sidebarOpen} />
-          <main className="flex-1 overflow-y-auto p-6">
+          <main className="flex-1 overflow-y-auto p-6 bg-gray-100 dark:bg-gray-900">
             <Routes>
               <Route path="/" element={<Dashboard />} />
               <Route path="/assets" element={<Assets />} />
