@@ -15,7 +15,6 @@ export const ForgotPassword = () => {
 
     const { error } = await authService.forgotPassword(email)
     
-    setLoading(false)
     if (error) {
       setMessage({ text: error, type: 'error' })
     } else {
@@ -23,7 +22,10 @@ export const ForgotPassword = () => {
         text: 'Password reset instructions have been sent to your email.',
         type: 'success' 
       })
+      // Redirect to login after 3 seconds on success
+      setTimeout(() => navigate('/login'), 3000)
     }
+    setLoading(false)
   }
 
   return (

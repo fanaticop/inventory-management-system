@@ -3,7 +3,9 @@ import { supabase } from '../lib/supabase'
 export const authService = {
   async forgotPassword(email: string): Promise<{ error: string | null }> {
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(email)
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/#/reset-password`
+      })
       
       if (error) throw error
       return { error: null }
