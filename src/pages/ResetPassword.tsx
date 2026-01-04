@@ -54,7 +54,7 @@ export function ResetPassword() {
 
     try {
       const { error } = await supabase.auth.resetPasswordForEmail(requestEmail, {
-        redirectTo: `${window.location.origin}/#/reset-password`
+        redirectTo: 'https://fanaticop.github.io/inventory-management-system/#/reset-password'
       });
       
       if (error) throw error;
@@ -63,6 +63,23 @@ export function ResetPassword() {
         text: 'Password reset instructions have been sent to your email.',
         type: 'success'
       });
+
+      // If emails are saved to demo_email_outbox (no Supabase configured), show a button to view the last demo email
+      const outboxRaw = localStorage.getItem('demo_email_outbox');
+      if (outboxRaw) {
+        try {
+          const outbox = JSON.parse(outboxRaw);
+          const last = outbox[outbox.length - 1];
+          if (last && last.content) {
+            // attach the preview HTML to message so UI can offer a quick view
+            setMessage({ text: 'Password reset instructions have been sent to your email.', type: 'success' });
+            // temporarily save latest preview to `last_demo_email_preview`
+            localStorage.setItem('last_demo_email_preview', JSON.stringify(last));
+          }
+        } catch {
+          // ignore parse errors
+        }
+      }
 
       // Redirect to login after success message
       setTimeout(() => navigate('/login'), 3000);
@@ -117,114 +134,119 @@ export function ResetPassword() {
   };
 
   return (
-    <div className="auth-page">
-      <div className="min-h-screen flex items-center justify-center p-4">
-        <div className="max-w-md w-full p-6 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-lg shadow-lg">
-          {token && resetEmail ? (
-            <>
-              <h2 className="text-2xl font-bold text-center mb-6 text-gray-900 dark:text-white">
-                Reset Password
-              </h2>
-              <p className="text-gray-600 dark:text-gray-300 text-center mb-6">
-                Enter your new password below
-              </p>
+    <div className="min-h-screen flex items-center justify-center bg-gray-900">
+      <div className="max-w-md w-full px-6 py-8 bg-gray-800 rounded-lg shadow-md">
+        {token && resetEmail ? (
+          // Reset Password Form
+          <>
+            <h2 className="text-3xl font-bold text-center text-white mb-6">
+              Reset Password
+            </h2>
+            <p className="text-gray-300 text-center mb-6">
+              Enter your new password below
+            </p>
 
-              {error && (
-                <div className="mb-4 p-4 rounded bg-red-100 dark:bg-red-800 text-red-700 dark:text-red-100">
-                  {error}
+            {error && (
+              <div className="mb-4 p-4 rounded bg-red-600 text-white">
+                {error}
+              </div>
+            )}
+
+            <form onSubmit={handleResetSubmit} className="space-y-6">
+              <div>
+                <input
+                  type="password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  placeholder="New Password"
+                  className="w-full px-4 py-3 rounded bg-gray-700 text-white border border-gray-600 focus:outline-none focus:border-purple-500"
+                  required
+                />
+              </div>
+
+              <div>
+                <input
+                  type="password"
+                  name="confirmPassword"
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                  placeholder="Confirm New Password"
+                  className="w-full px-4 py-3 rounded bg-gray-700 text-white border border-gray-600 focus:outline-none focus:border-purple-500"
+                  required
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={loading || !isValid}
+                className={`w-full py-3 rounded bg-purple-600 text-white font-semibold hover:bg-purple-700 focus:outline-none transition duration-150 ${
+                  (loading || !isValid) ? 'opacity-50 cursor-not-allowed' : ''
+                }`}
+              >
+                {loading ? 'Resetting...' : 'Reset Password'}
+              </button>
+            </form>
+          </>
+        ) : (
+          // Request Password Reset Form
+          <>
+            <h2 className="text-3xl font-bold text-center text-white mb-6">
+              Reset Password
+            </h2>
+            <p className="text-gray-300 text-center mb-6">
+              Enter your email to receive a password reset link
+            </p>
+
+            <form onSubmit={handleRequestReset} className="space-y-6">
+              <div>
+                <input
+                  type="email"
+                  value={requestEmail}
+                  onChange={(e) => setRequestEmail(e.target.value)}
+                  placeholder="Enter your email"
+                  className="w-full px-4 py-3 rounded bg-gray-700 text-white border border-gray-600 focus:outline-none focus:border-purple-500"
+                  required
+                />
+              </div>
+
+              {message && (
+                <div className={`p-4 rounded text-center ${
+                  message.type === 'success' 
+                    ? 'bg-green-600 text-white' 
+                    : 'bg-red-600 text-white'
+                }`}>
+                    {message.text}
+                    {message.type === 'success' && localStorage.getItem('last_demo_email_preview') && (
+                      <div className="mt-2">
+                        <a href="#" onClick={(e) => { e.preventDefault(); const preview = JSON.parse(localStorage.getItem('last_demo_email_preview') || '{}'); const w = window.open(); if (w) { w.document.write(preview.content); w.document.close(); } }} className="underline">View demo email</a>
+                      </div>
+                    )}
                 </div>
               )}
 
-              <form onSubmit={handleResetSubmit} className="space-y-6">
-                <div>
-                  <input
-                    type="password"
-                    name="password"
-                    value={formData.password}
-                    onChange={handleChange}
-                    placeholder="New Password"
-                    className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-gray-900 dark:text-white focus:outline-none focus:ring-purple-500 focus:border-purple-500"
-                    required
-                  />
-                </div>
+              <button
+                type="submit"
+                disabled={loading}
+                className={`w-full py-3 rounded bg-purple-600 text-white font-semibold hover:bg-purple-700 focus:outline-none transition duration-150 ${
+                  loading ? 'opacity-50 cursor-not-allowed' : ''
+                }`}
+              >
+                {loading ? 'Sending Reset Link...' : 'Send Reset Link'}
+              </button>
 
-                <div>
-                  <input
-                    type="password"
-                    name="confirmPassword"
-                    value={formData.confirmPassword}
-                    onChange={handleChange}
-                    placeholder="Confirm New Password"
-                    className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-gray-900 dark:text-white focus:outline-none focus:ring-purple-500 focus:border-purple-500"
-                    required
-                  />
-                </div>
-
+              <div className="text-center">
                 <button
-                  type="submit"
-                  disabled={loading || !isValid}
-                  className={`w-full py-3 rounded bg-purple-600 text-white font-semibold hover:bg-purple-700 focus:outline-none transition duration-150 ${
-                    (loading || !isValid) ? 'opacity-50 cursor-not-allowed' : ''
-                  }`}
+                  type="button"
+                  onClick={() => navigate('/login')}
+                  className="text-purple-400 hover:text-purple-300 font-medium"
                 >
-                  {loading ? 'Resetting...' : 'Reset Password'}
+                  Back to Sign In
                 </button>
-              </form>
-            </>
-          ) : (
-            <>
-              <h2 className="text-2xl font-bold text-center mb-6 text-gray-900 dark:text-white">
-                Reset Password
-              </h2>
-              <p className="text-gray-600 dark:text-gray-300 text-center mb-6">
-                Enter your email to receive a password reset link
-              </p>
-
-              <form onSubmit={handleRequestReset} className="space-y-6">
-                <div>
-                  <input
-                    type="email"
-                    value={requestEmail}
-                    onChange={(e) => setRequestEmail(e.target.value)}
-                    placeholder="Enter your email"
-                    className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-gray-900 dark:text-white focus:outline-none focus:ring-purple-500 focus:border-purple-500"
-                    required
-                  />
-                </div>
-
-                {message && (
-                  <div className={`p-4 rounded text-center ${
-                    message.type === 'success' 
-                      ? 'bg-green-100 dark:bg-green-800 text-green-700 dark:text-green-100' 
-                      : 'bg-red-100 dark:bg-red-800 text-red-700 dark:text-red-100'
-                  }`}>
-                    {message.text}
-                  </div>
-                )}
-
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className={`w-full py-3 rounded bg-purple-600 text-white font-semibold hover:bg-purple-700 focus:outline-none transition duration-150 ${
-                    loading ? 'opacity-50 cursor-not-allowed' : ''
-                  }`}
-                >
-                  {loading ? 'Sending Reset Link...' : 'Send Reset Link'}
-                </button>
-
-                <div className="text-center">
-                  <button
-                    type="button"
-                    onClick={() => navigate('/login')}
-                    className="text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 font-medium"
-                  >
-                    Back to Sign In
-                  </button>
-                </div>
-              </form>
-            </>
-          )}
-        </div>
+              </div>
+            </form>
+          </>
+        )}
       </div>
     </div>
   );

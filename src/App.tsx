@@ -10,6 +10,7 @@ import { StockDetails } from './pages/StockDetails'
 import { useStore } from './store/useStore'
 import { Login } from './pages/Login'
 import { ResetPassword } from './pages/ResetPassword'
+import { EmailOutbox } from './pages/EmailOutbox'
 import { ForgotPassword } from './components/ForgotPassword'
 
 function App() {
@@ -23,6 +24,7 @@ function App() {
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/debug/emails" element={<EmailOutbox />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="*" element={<Navigate to="/login" replace />} />
           </Routes>

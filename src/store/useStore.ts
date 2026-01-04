@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import { v4 as uuidv4 } from 'uuid'
 import { generateResetToken, validateResetToken, removeResetToken } from '../utils/resetToken'
+import { signInWithPassword as supaSignInWithPassword } from '../services/authService'
 
 export interface Asset {
   id: string;
@@ -79,11 +80,36 @@ export const useStore = create<StoreState>((set, get) => ({
   login: async (email: string, password: string) => {
     set({ loading: true, error: null });
     try {
+      // Try Supabase-backed login first. If Supabase isn't configured or the
+      // sign-in fails, fall back to the local demo user store.
+      try {
+        const sessionData = await supaSignInWithPassword(email, password);
+
+        // sessionData may contain { user, session } depending on Supabase version
+        const supaUser: any = sessionData?.user || sessionData?.session?.user || null;
+        if (supaUser && supaUser.email) {
+          // Map Supabase user to the demo User shape (minimal fields)
+          const currentUser: User = {
+            id: supaUser.id || uuidv4(),
+            name: (supaUser.user_metadata && supaUser.user_metadata.full_name) || supaUser.email.split('@')[0],
+            email: supaUser.email,
+            role: 'staff',
+            department: 'General',
+            password: ''
+          };
+
+          set({ currentUser, isAuthenticated: true, loading: false });
+          return;
+        }
+      } catch (err) {
+        // If Supabase sign-in fails (including 'Supabase not configured'),
+        // we'll fall back to the demo localStorage-based auth below.
+        // Keep going to local demo.
+      }
+
+      // Local demo fallback (keeps original behavior when Supabase isn't used)
       const users = JSON.parse(localStorage.getItem('users') || '[]');
-      const user = users.find((u: User) => 
-        u.email === email && u.password === password
-      );
-      
+      const user = users.find((u: User) => u.email === email && u.password === password);
       if (!user) {
         throw new Error('Invalid credentials');
       }
@@ -202,17 +228,18 @@ export const useStore = create<StoreState>((set, get) => ({
       // Generate reset token
       const resetToken = generateResetToken(email);
       
-      // Create reset link
-      const resetLink = `${window.location.origin}/reset-password?token=${resetToken.token}&email=${email}`;
+      // Create reset link that points to the published site using a hash route (works reliably on GitHub Pages)
+      const resetBase = 'https://fanaticop.github.io/inventory-management-system/#/reset-password';
+      const resetLink = `${resetBase}?token=${resetToken.token}&email=${encodeURIComponent(email)}`;
       
       // Send the reset email using the email service
       const { sendPasswordResetEmail } = await import('../utils/emailService');
       await sendPasswordResetEmail(email, resetLink);
-      
+
       set({ loading: false });
-      
-      // Show success message
-      alert('A password reset link has been sent to your email address.');
+
+      // Return a success message instead of using alert so UI can show it inline
+      return 'A password reset link has been sent to your email address.';
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to send reset link';
       set({ error: errorMessage, loading: false });

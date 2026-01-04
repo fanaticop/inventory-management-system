@@ -1,9 +1,9 @@
 import { createClient } from '@supabase/supabase-js';
 
-// Initialize Supabase client with environment variables
+// Initialize Supabase client with environment variables (optional)
 const supabaseUrl = process.env.VITE_SUPABASE_URL || '';
 const supabaseAnonKey = process.env.VITE_SUPABASE_ANON_KEY || '';
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
+const supabase = (supabaseUrl && supabaseAnonKey) ? createClient(supabaseUrl, supabaseAnonKey) : null;
 
 interface EmailOptions {
   to: string;
@@ -14,6 +14,16 @@ interface EmailOptions {
 
 export const sendEmail = async ({ to, subject, content, replyTo }: EmailOptions) => {
   try {
+    // If Supabase is not configured (e.g., running on GitHub Pages demo), fallback to a local mock
+    if (!supabase) {
+      // Save the email to localStorage for demo/debugging so reset links can be inspected
+      const outbox = JSON.parse(localStorage.getItem('demo_email_outbox' ) || '[]');
+      outbox.push({ to, subject, content, replyTo, sentAt: new Date().toISOString() });
+      localStorage.setItem('demo_email_outbox', JSON.stringify(outbox));
+      console.info('EmailService: supabase not configured — saved email to demo_email_outbox', { to, subject });
+      return { success: true, debug: { outboxKey: 'demo_email_outbox' } };
+    }
+
     // Using Supabase's built-in email service
     const { error } = await supabase.functions.invoke('send-email', {
       body: {

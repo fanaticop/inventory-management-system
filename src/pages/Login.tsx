@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useStore } from '../store/useStore';
 import { FormSkeleton } from '../components/Skeleton';
+import AuthExample from '../components/AuthExample';
 
 interface SocialLoginModalState {
   show: boolean;
@@ -11,7 +12,7 @@ interface SocialLoginModalState {
 
 export function Login() {
   const navigate = useNavigate();
-  const { login } = useStore();
+  const { login, signup, resetPassword, socialLogin } = useStore();
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -21,6 +22,9 @@ export function Login() {
   });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
+  const [isForgotPassword, setIsForgotPassword] = useState(false);
+  const [isSignup, setIsSignup] = useState(false);
   const [socialLoginModal, setSocialLoginModal] = useState<SocialLoginModalState>({
     show: false,
     provider: '',
@@ -31,14 +35,16 @@ export function Login() {
     e.preventDefault();
     setIsLoading(true);
     setError(null);
+    setSuccess(null);
     
     try {
       if (isForgotPassword) {
-        if (!formData.email) {
-          throw new Error('Please enter your email address');
+        if (!formData.email || !formData.email.includes('@')) {
+          throw new Error('Please enter a valid email address');
         }
-        await resetPassword(formData.email);
-        // Don't show alert here, as resetPassword already shows the reset link
+        const msg = await resetPassword(formData.email);
+        // show success inline
+        setSuccess(msg || 'A password reset link has been sent to your email address.');
         setIsForgotPassword(false);
       } else if (isSignup) {
         // Check if user already exists
@@ -54,19 +60,17 @@ export function Login() {
         // Check if user exists before attempting login
         const users = JSON.parse(localStorage.getItem('users') || '[]');
         if (!users.some((u: any) => u.email === formData.email)) {
-          alert('User not found. Please sign up.');
-          setIsSignup(true);
+          setError('No account found with this email. Please sign up.');
           setIsLoading(false);
           return;
         }
         await login(formData.email, formData.password);
       }
       navigate('/');
-    } catch (err) {
-      setError(
-        isForgotPassword ? 'Password reset failed' :
-        isSignup ? 'Signup failed' : 'Invalid email or password'
-      );
+      } catch (err) {
+      const message = err instanceof Error ? err.message : null;
+      if (message) setError(message);
+      else setError(isForgotPassword ? 'Password reset failed' : isSignup ? 'Signup failed' : 'Invalid email or password');
     } finally {
       setIsLoading(false);
     }
@@ -143,14 +147,14 @@ export function Login() {
   };
 
   return (
-    <div className="auth-page">
+    <div className="login-bg">
       <div className="min-h-screen flex items-center justify-center p-4">
-        <div className="max-w-md w-full space-y-8 p-8 rounded-xl bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm shadow-lg">
+        <div className="login-container max-w-lg w-full space-y-8 p-10 rounded-2xl">
           <div className="text-center">
-            <h2 className="mt-6 text-3xl font-bold text-white">
+            <h2 className="mt-4 text-4xl font-extrabold text-white">
               {isForgotPassword ? "Reset Password" : isSignup ? "Create Account" : "Welcome Back"}
             </h2>
-            <p className="mt-2 text-sm text-neutral-400">
+            <p className="mt-2 text-sm text-neutral-300">
               {isForgotPassword
                 ? "Enter your email to receive a password reset link"
                 : isSignup
@@ -165,6 +169,11 @@ export function Login() {
               {error && (
                 <div className="rounded-md bg-red-50 p-4 mb-4">
                   <div className="text-sm text-red-700">{error}</div>
+                </div>
+              )}
+              {success && (
+                <div className="rounded-md bg-green-50 p-4 mb-4">
+                  <div className="text-sm text-green-700">{success}</div>
                 </div>
               )}
 
@@ -351,18 +360,31 @@ export function Login() {
                       {isSignup ? "Already have an account? Sign in" : "Don't have an account? Sign up"}
                     </button>
                   )}
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setIsForgotPassword(!isForgotPassword);
-                      setError(null);
-                    }}
-                    className="link-text"
-                  >
-                    {isForgotPassword ? "Back to Sign In" : "Forgot your password?"}
-                  </button>
+
+                  {/* Use a proper Link to the reset page so direct navigation works and is accessible */}
+                  {!isForgotPassword ? (
+                    <Link to="/reset-password" className="link-text" onClick={() => setError(null)}>
+                      Forgot your password?
+                    </Link>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsForgotPassword(false);
+                        setError(null);
+                      }}
+                      className="link-text"
+                    >
+                      Back to Sign In
+                    </button>
+                  )}
                 </div>
               )}
+
+              {/* Small auth example for manual testing in the browser */}
+              <div className="mt-6">
+                <AuthExample />
+              </div>
             </form>
           )}
         </div>
