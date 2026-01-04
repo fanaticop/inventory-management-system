@@ -6,8 +6,12 @@ import { createClient } from '@supabase/supabase-js'
 const envUrl = import.meta.env.VITE_SUPABASE_URL;
 const envKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-const fallbackUrl = 'https://kkrshiqqzrgbngczytrg.supabase.co';
-const fallbackKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtrcnNoaXFxenJnYm5nY3p5dHJnIiwicm9sZSI6ImFub24iLCJpYXQiOjE2OTk1MjgyODgsImV4cCI6MjAxNTEwNDI4OH0.cg_n0K8gz0agi0p0DbUXn-4XE5E8rsEQENrGodYE6tY';
+// NOTE: We intentionally do NOT initialize a real Supabase client with a hard-coded
+// fallback project. In earlier iterations a fallback URL existed here but the
+// placeholder project may not resolve (causing ERR_NAME_NOT_RESOLVED in the
+// browser). To avoid noisy runtime network errors for users who haven't set
+// up Supabase yet, we only create a real client when proper env vars are
+// provided; otherwise we use a safe mock client that fails gracefully.
 
 function isValidHttpUrl(url?: string | null) {
   if (!url) return false;
@@ -40,15 +44,12 @@ if (!useEnvUrl || !useEnvKey) {
 let supabaseClient: any = null;
 if (useEnvUrl && useEnvKey) {
   supabaseClient = createClient(useEnvUrl, useEnvKey);
-} else if (isValidHttpUrl(fallbackUrl) && fallbackKey) {
-  // If env not configured but a fallback exists (useful for local demos), try fallback safely
-  try {
-    supabaseClient = createClient(fallbackUrl, fallbackKey);
-  } catch (e) {
-    // If fallback is somehow invalid, we'll provide a safe mock instead of throwing
-    console.warn('Fallback Supabase client initialization failed, enabling mock supabase.');
-    supabaseClient = null;
-  }
+} else {
+  // No env config provided — don't attempt to initialize a hard-coded/fallback
+  // project because it may not exist and would cause DNS/network errors in
+  // the browser. Consumers will get helpful errors via the mock client below
+  // and a pointer to SUPABASE_SETUP.md in the console.
+  supabaseClient = null;
 }
 
 // Minimal mock supabase client to avoid runtime crashes when config is missing

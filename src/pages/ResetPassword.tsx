@@ -53,11 +53,11 @@ export function ResetPassword() {
     setMessage(null);
 
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(requestEmail, {
-        redirectTo: 'https://fanaticop.github.io/inventory-management-system/#/reset-password'
-      });
-      
-      if (error) throw error;
+        const { error } = await supabase.auth.resetPasswordForEmail(requestEmail, {
+          redirectTo: 'https://fanaticop.github.io/inventory-management-system/#/reset-password'
+        });
+
+        if (error) throw error;
 
       setMessage({
         text: 'Password reset instructions have been sent to your email.',
@@ -84,10 +84,22 @@ export function ResetPassword() {
       // Redirect to login after success message
       setTimeout(() => navigate('/login'), 3000);
     } catch (error: any) {
-      setMessage({
-        text: error.message || 'Failed to send reset email',
-        type: 'error'
-      });
+      // Normalize network/DNS errors into a user-friendly message and log
+      // the original error for debugging.
+      const rawMessage = error && error.message ? String(error.message) : '';
+      console.error('Reset password failed:', error);
+
+      if (rawMessage.includes('Failed to fetch') || rawMessage.includes('ERR_NAME_NOT_RESOLVED') || rawMessage.includes('NetworkError')) {
+        setMessage({
+          text: 'Network error: could not reach the authentication service. Check your Supabase configuration (VITE_SUPABASE_URL) and your network connection. See SUPABASE_SETUP.md for help.',
+          type: 'error'
+        });
+      } else {
+        setMessage({
+          text: rawMessage || 'Failed to send reset email',
+          type: 'error'
+        });
+      }
     } finally {
       setLoading(false);
     }
