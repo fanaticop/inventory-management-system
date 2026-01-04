@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Redirecting…</title>
+    <script>
+      (function(){
+        try {
+          var pathname = window.location.pathname || '/';
+          var base = pathname.replace(/\/?debug\/emails\.html$/, '/');
+          var search = window.location.search || '';
+          var target = window.location.origin + base + '#/debug/emails' + search;
+          window.location.replace(target);
+        } catch (e) {
+          window.location.replace(window.location.origin + '#/debug/emails' + (window.location.search || ''));
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    Redirecting to debug emails page…
+  </body>
+</html>
